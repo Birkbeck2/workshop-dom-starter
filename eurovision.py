@@ -1,6 +1,7 @@
 import csv
 import json
 import re
+from urllib.parse import urlparse, parse_qs
 
 # This is the python script used by instructors to create the JSON
 # files in this repository. Students don't need to do anything with
@@ -45,6 +46,12 @@ with open('contestants.csv') as fileref:
                         except ValueError:
                             # String
                             song[camelKey] = row[key]
+        try:
+            youtubeId = parse_qs(urlparse(row['youtube_url']).query).get('v', [])[0]
+            song['youtubeImg'] = f'https://img.youtube.com/vi/{youtubeId}/hqdefault.jpg'
+        except (ValueError, IndexError):
+            print('No YouTube link found:', row)
+            pass
         songs.append(song)
 
 with open(f'eurovisionContestants.js', 'w') as fileref:
